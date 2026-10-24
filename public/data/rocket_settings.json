@@ -1,0 +1,171 @@
+{
+  "rocket_spec": {
+    "body": {
+      "height": 3.0,
+      "width": 0.3,
+      "mass": 80.0
+    },
+    "engine_block": {
+      "height": 0.4,
+      "mass": 20.0
+    },
+    "nozzles": [
+      {
+        "name": "main",
+        "position": [
+          0.0,
+          0.0
+        ],
+        "direction": [
+          0.0,
+          1.0
+        ],
+        "max_thrust": 2000.0
+      },
+      {
+        "name": "left",
+        "position": [
+          -0.15,
+          2.7
+        ],
+        "direction": [
+          1.0,
+          0.0
+        ],
+        "max_thrust": 25.0
+      },
+      {
+        "name": "right",
+        "position": [
+          0.15,
+          2.7
+        ],
+        "direction": [
+          -1.0,
+          0.0
+        ],
+        "max_thrust": 25.0
+      }
+    ],
+    "legs": [
+      {
+        "top": [
+          -0.15,
+          0.5
+        ],
+        "tip": [
+          -0.6,
+          -0.2
+        ]
+      },
+      {
+        "top": [
+          0.15,
+          0.5
+        ],
+        "tip": [
+          0.6,
+          -0.2
+        ]
+      }
+    ]
+  },
+  "env_config": {
+    "gravity": 9.81,
+    "dt": 0.02,
+    "substeps": 5,
+    "landing": {
+      "max_off_center": 0.5,
+      "max_vx": 0.5,
+      "max_vy": 0.3,
+      "max_tilt_deg": 5.0,
+      "max_spin_deg_s": 5.0
+    },
+    "limits": {
+      "max_x": 100.0,
+      "max_altitude": 300.0,
+      "max_tilt_deg": 90.0,
+      "time_limit": 60.0
+    },
+    "levels": [
+      {
+        "altitude": [
+          50,
+          80
+        ],
+        "x": [
+          -5,
+          5
+        ],
+        "vx": [
+          -1,
+          1
+        ],
+        "vy": [
+          -10,
+          -5
+        ],
+        "tilt_deg": [
+          -3,
+          3
+        ],
+        "spin_deg_s": [
+          0,
+          0
+        ]
+      },
+      {
+        "altitude": [
+          50,
+          150
+        ],
+        "x": [
+          -20,
+          20
+        ],
+        "vx": [
+          -5,
+          5
+        ],
+        "vy": [
+          -20,
+          -5
+        ],
+        "tilt_deg": [
+          -10,
+          10
+        ],
+        "spin_deg_s": [
+          -5,
+          5
+        ]
+      },
+      {
+        "altitude": [
+          100,
+          200
+        ],
+        "x": [
+          -40,
+          40
+        ],
+        "vx": [
+          -10,
+          10
+        ],
+        "vy": [
+          -30,
+          -10
+        ],
+        "tilt_deg": [
+          -15,
+          15
+        ],
+        "spin_deg_s": [
+          -10,
+          10
+        ]
+      }
+    ]
+  }
+}
