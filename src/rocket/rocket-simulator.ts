@@ -4,7 +4,7 @@
 // and moment of inertia, turns each nozzle's force (applied where the nozzle is mounted) into
 // pushing and turning, adds gravity, moves the rocket, and detects when it touches the ground.
 
-import { Box, Polygon, World, type Body, type Contact } from 'planck'
+import { Box, Polygon, World, type Body, type Contact, type Fixture } from 'planck'
 import type { Leg, RocketSpec, Vector } from './rocket-spec.ts'
 import type { RocketState } from './rocket-state.ts'
 
@@ -26,6 +26,12 @@ export enum RocketPart {
 export interface Touchdown {
   readonly state: RocketState // just before the contact, before planck's contact forces act
   readonly parts: ReadonlySet<RocketPart> // what touched the ground
+}
+
+/** One of planck's shapes on the rocket. */
+export interface RocketShape {
+  readonly rocketPart: RocketPart
+  readonly corners: readonly Vector[] // in world coordinates [m]
 }
 
 /**
@@ -162,6 +168,36 @@ export class RocketSimulator {
     }
   }
 
+  /** Each of planck's shapes on the rocket, in the order they were added. */
+  shapes(): RocketShape[] {
+    const planckRocket = this.planckRocket
+    const rocketShapes: RocketShape[] = []
+    // planck lists the newest fixture first: adding each one to the front restores the order
+    // they were added in, so the engine block is drawn over the body.
+    let fixture = planckRocket.getFixtureList()
+    while (fixture !== null) {
+      const polygon = fixture.getShape()
+      const rocketPart = rocketPartOf(fixture)
+      // Every fixture on the rocket is a named polygon; the check tells TypeScript so.
+      if (polygon instanceof Polygon && rocketPart !== undefined) {
+        const corners = polygon.m_vertices.map((vertex) => planckRocket.getWorldPoint(vertex))
+        rocketShapes.unshift({ rocketPart, corners })
+      }
+      fixture = fixture.getNext()
+    }
+    return rocketShapes
+  }
+
+  /** A point in rocket coordinates (e.g. a nozzle position), in world coordinates [m]. */
+  pointToWorld(point: Vector): Vector {
+    return this.planckRocket.getWorldPoint(point)
+  }
+
+  /** A direction in rocket coordinates (e.g. a nozzle's), in world coordinates. */
+  directionToWorld(direction: Vector): Vector {
+    return this.planckRocket.getWorldVector(direction)
+  }
+
   /** A fresh world with gravity and the ground, which tells which rocket parts touch the ground. */
   private createWorld(): World {
     const world = new World({ gravity: { x: 0, y: -this.gravity }, allowSleep: false })
@@ -176,12 +212,17 @@ export class RocketSimulator {
     // The ground and the rocket are the only bodies, so every contact is between the ground
     // and a rocket part. The ground's fixture has no name.
     for (const fixture of [contact.getFixtureA(), contact.getFixtureB()]) {
-      const rocketPart = Object.values(RocketPart).find((part) => part === fixture.getUserData())
+      const rocketPart = rocketPartOf(fixture)
       if (rocketPart !== undefined) {
         this.groundContacts.add(rocketPart)
       }
     }
   }
+}
+
+/** The rocket part a fixture is, from its name; undefined for the ground. */
+function rocketPartOf(fixture: Fixture): RocketPart | undefined {
+  return Object.values(RocketPart).find((rocketPart) => rocketPart === fixture.getUserData())
 }
 
 /** The rocket as a planck body, with its origin at the center of the base. */

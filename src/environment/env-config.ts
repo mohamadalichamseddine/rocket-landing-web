@@ -1,6 +1,10 @@
 // Settings of the landing environment, read from public/data/rocket_settings.json.
 
+import { radians } from '../angles.ts'
 import type { RocketSettingsJson } from '../data-files.ts'
+import type { RocketState } from '../rocket/rocket-state.ts'
+
+export type Range = readonly [number, number] // [min, max]
 
 /** Limits a touchdown must stay within to count as a safe landing. */
 export interface LandingCriteria {
@@ -18,12 +22,23 @@ export interface FlightLimits {
   readonly timeLimit: number // [s]
 }
 
+/** Starting conditions for one difficulty level. */
+export interface StartRanges {
+  readonly altitude: Range // center of mass [m]
+  readonly x: Range // [m]
+  readonly vx: Range // [m/s]
+  readonly vy: Range // [m/s]
+  readonly tiltDeg: Range
+  readonly spinDegS: Range
+}
+
 export interface EnvConfig {
   readonly gravity: number // [m/s²]
   readonly dt: number // control step [s]
   readonly substeps: number // planck steps per control step
   readonly landing: LandingCriteria
   readonly limits: FlightLimits
+  readonly levels: readonly StartRanges[] // by difficulty, 0 = easiest
 }
 
 /** Build the environment settings from the settings file's `env_config`. */
@@ -47,5 +62,31 @@ export function buildEnvConfig(envConfigJson: RocketSettingsJson['env_config']):
       maxTiltDeg: limits.max_tilt_deg,
       timeLimit: limits.time_limit,
     },
+    levels: envConfigJson.levels.map((level) => ({
+      altitude: toRange(level.altitude),
+      x: toRange(level.x),
+      vx: toRange(level.vx),
+      vy: toRange(level.vy),
+      tiltDeg: toRange(level.tilt_deg),
+      spinDegS: toRange(level.spin_deg_s),
+    })),
   }
+}
+
+/** The start in the middle of each of a level's ranges. */
+export function middleOf(startRanges: StartRanges): RocketState {
+  const middle = (range: Range) => (range[0] + range[1]) / 2
+  return {
+    x: middle(startRanges.x),
+    y: middle(startRanges.altitude),
+    vx: middle(startRanges.vx),
+    vy: middle(startRanges.vy),
+    tilt: radians(middle(startRanges.tiltDeg)),
+    spin: radians(middle(startRanges.spinDegS)),
+  }
+}
+
+/** The file writes ranges as [min, max]. */
+function toRange(minMax: readonly number[]): Range {
+  return [minMax[0], minMax[1]]
 }
