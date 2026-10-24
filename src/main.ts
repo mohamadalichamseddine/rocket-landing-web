@@ -1,21 +1,29 @@
-// The page: loads the settings, draws the rocket at its start, and flies it.
+// The page: loads the settings and the network, shows the rocket at the chosen start, and flies
+// it, by the network or by hand.
 
 import './style.css'
-import { fetchRocketSettings } from './data-files.ts'
+import { fetchNetworkWeights, fetchRocketSettings } from './data-files.ts'
 import { buildEnvConfig, middleOf } from './environment/env-config.ts'
 import { buildRocketLandingEnv } from './environment/rocket-landing-env.ts'
 import { FlightLoop } from './flight-loop.ts'
 import { KeyboardControls } from './keyboard-controls.ts'
+import { buildNetworkController } from './ppo/network-controller.ts'
 import { buildRocketSpec } from './rocket/rocket-spec.ts'
+import { StartSliders } from './start-sliders.ts'
 import { EnvironmentRenderer } from './visualization/environment-renderer.ts'
 import { StatusPanel } from './visualization/status-panel.ts'
 
-const rocketSettingsJson = await fetchRocketSettings()
+const [rocketSettingsJson, networkWeightsJson] = await Promise.all([
+  fetchRocketSettings(),
+  fetchNetworkWeights(),
+])
 const rocketSpec = buildRocketSpec(rocketSettingsJson.rocket_spec)
 const envConfig = buildEnvConfig(rocketSettingsJson.env_config)
 const rocketLandingEnv = buildRocketLandingEnv(rocketSpec, envConfig)
+const networkController = buildNetworkController(networkWeightsJson)
 
 const canvas = pageElement('scene', HTMLCanvasElement)
+const letNetworkFlyButton = pageElement('let-network-fly', HTMLButtonElement)
 const flyYourselfButton = pageElement('fly-yourself', HTMLButtonElement)
 const flyYourselfHint = pageElement('fly-yourself-hint', HTMLElement)
 const environmentRenderer = new EnvironmentRenderer(canvas)
@@ -25,10 +33,20 @@ const statusPanel = new StatusPanel(
 )
 const flightLoop = new FlightLoop(rocketLandingEnv, environmentRenderer, statusPanel)
 const keyboardControls = new KeyboardControls(window)
+// The sliders cover level 1, which contains level 0: every start they allow is one the network
+// trained on. They start in the middle of level 0, the easiest.
+const startSliders = new StartSliders(
+  pageElement('start-sliders', HTMLElement),
+  envConfig.levels[1],
+  middleOf(envConfig.levels[0]),
+  () => {
+    // A new start stops the flight on screen and shows the rocket there.
+    keyboardControls.disable()
+    flightLoop.showStart(startSliders.start(), null)
+  },
+)
 
-// Until there are sliders to choose it, the start is the middle of the easiest level.
-const start = middleOf(envConfig.levels[0])
-flightLoop.showStart(start, null)
+flightLoop.showStart(startSliders.start(), null)
 new ResizeObserver(() => {
   environmentRenderer.resize()
   flightLoop.draw()
@@ -40,7 +58,17 @@ if (matchMedia('(pointer: coarse)').matches) {
   flyYourselfHint.textContent = 'Flying it yourself needs a keyboard.'
 }
 
+letNetworkFlyButton.addEventListener('click', () => {
+  keyboardControls.disable()
+  flightLoop.fly(
+    startSliders.start(),
+    (observation) => networkController.act(observation),
+    () => {},
+  )
+})
+
 flyYourselfButton.addEventListener('click', () => {
+  const start = startSliders.start()
   // As in the Python window, the rocket waits at the start until Space is pressed.
   flightLoop.showStart(start, 'Press Space to start')
   keyboardControls.enable(() =>

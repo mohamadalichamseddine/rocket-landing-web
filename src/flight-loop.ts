@@ -48,7 +48,7 @@ export class FlightLoop {
   fly(
     start: RocketState,
     chooseAction: (observation: readonly number[]) => number[],
-    onFlightOver: (outcome: Outcome) => void,
+    onFlightOver: () => void,
   ): void {
     this.begin(start)
     this.message = null
@@ -74,7 +74,7 @@ export class FlightLoop {
         this.animationFrame = requestAnimationFrame(flyFrame)
       } else {
         this.animationFrame = null
-        onFlightOver(outcome)
+        onFlightOver()
       }
     }
     this.animationFrame = requestAnimationFrame(flyFrame)

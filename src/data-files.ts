@@ -11,10 +11,20 @@ export type NetworkWeightsJson = typeof networkWeightsJson
 export type RocketSettingsJson = typeof rocketSettingsJson
 
 /** Download the rocket settings file, which is served next to the page. */
-export async function fetchRocketSettings(): Promise<RocketSettingsJson> {
-  const response = await fetch(`${import.meta.env.BASE_URL}data/rocket_settings.json`)
+export function fetchRocketSettings(): Promise<RocketSettingsJson> {
+  return fetchJson('data/rocket_settings.json')
+}
+
+/** Download the network weights file, which is served next to the page. */
+export function fetchNetworkWeights(): Promise<NetworkWeightsJson> {
+  return fetchJson('network/network_weights.json')
+}
+
+/** Download a JSON file served next to the page, at this path. */
+async function fetchJson(path: string) {
+  const response = await fetch(`${import.meta.env.BASE_URL}${path}`)
   if (!response.ok) {
-    throw new Error(`could not load the rocket settings: ${response.status} ${response.statusText}`)
+    throw new Error(`could not load ${path}: ${response.status} ${response.statusText}`)
   }
   return response.json()
 }
