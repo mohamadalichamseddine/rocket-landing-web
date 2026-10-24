@@ -20,7 +20,8 @@ export class FlightLoop {
   private observation: number[] = []
   private lastStep: StepResult | null = null // null before the first step
   private message: string | null = null
-  private animationFrame: number | null = null // the next frame of the flight being flown
+  private animationFrame: number | null = null // the next frame of the flight, while it flies
+  private resumeFlight: (() => void) | null = null // flies on; null if no flight or it's over
 
   constructor(
     rocketLandingEnv: RocketLandingEnv,
@@ -74,10 +75,40 @@ export class FlightLoop {
         this.animationFrame = requestAnimationFrame(flyFrame)
       } else {
         this.animationFrame = null
+        this.resumeFlight = null
         onFlightOver()
       }
     }
-    this.animationFrame = requestAnimationFrame(flyFrame)
+    this.resumeFlight = () => {
+      previousFrameTime = null // the time the flight was paused isn't flown
+      this.animationFrame = requestAnimationFrame(flyFrame)
+    }
+    this.resumeFlight()
+  }
+
+  /** Whether a flight is paused (it isn't over, and isn't flying). */
+  get paused(): boolean {
+    return this.resumeFlight !== null && this.animationFrame === null
+  }
+
+  /** Pause the flight, with `message` over it; nothing if no flight is flying. */
+  pause(message: string): void {
+    if (this.animationFrame === null) {
+      return
+    }
+    cancelAnimationFrame(this.animationFrame)
+    this.animationFrame = null
+    this.message = message
+    this.draw()
+  }
+
+  /** Go on with the paused flight; nothing if no flight is paused. */
+  resume(): void {
+    if (this.resumeFlight === null || this.animationFrame !== null) {
+      return
+    }
+    this.message = null
+    this.resumeFlight()
   }
 
   /** Draw the current frame: the scene and the numbers (again, e.g. after a resize). */
@@ -105,6 +136,7 @@ export class FlightLoop {
       cancelAnimationFrame(this.animationFrame)
       this.animationFrame = null
     }
+    this.resumeFlight = null
     this.observation = this.rocketLandingEnv.reset(start)
     this.lastStep = null
     this.environmentRenderer.startFlight()

@@ -68,16 +68,20 @@ letNetworkFlyButton.addEventListener('click', () => {
 })
 
 flyYourselfButton.addEventListener('click', () => {
-  const start = startSliders.start()
-  // As in the Python window, the rocket waits at the start until Space is pressed.
-  flightLoop.showStart(start, 'Press Space to start')
-  keyboardControls.enable(() =>
-    flightLoop.fly(
-      start,
-      () => keyboardControls.action(),
-      () => keyboardControls.disable(),
-    ),
+  // As in the Python window, the flight starts paused at t = 0, and Space pauses and resumes it.
+  flightLoop.fly(
+    startSliders.start(),
+    () => keyboardControls.action(),
+    () => keyboardControls.disable(),
   )
+  flightLoop.pause('Press Space to start')
+  keyboardControls.enable(() => {
+    if (flightLoop.paused) {
+      flightLoop.resume()
+    } else {
+      flightLoop.pause('Paused: press Space')
+    }
+  })
 })
 
 /** The element of the page with this id, which must be of this type. */
