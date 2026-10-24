@@ -1,11 +1,10 @@
 // The landing environment: fly the rocket one control step at a time, toward the pad at x = 0.
 
-import type { RocketSettingsJson } from '../data-files.ts'
 import { RocketSimulator, type Touchdown } from '../rocket/rocket-simulator.ts'
-import { buildRocketSpec } from '../rocket/rocket-spec.ts'
+import type { RocketSpec } from '../rocket/rocket-spec.ts'
 import type { RocketState } from '../rocket/rocket-state.ts'
 import { actionToThrottles } from './action.ts'
-import { buildEnvConfig } from './env-config.ts'
+import type { EnvConfig } from './env-config.ts'
 import { LandingJudge, type LandingCheck } from './landing-judge.ts'
 import { stateToObservation } from './observation.ts'
 import type { Outcome } from './outcome.ts'
@@ -13,6 +12,7 @@ import type { Outcome } from './outcome.ts'
 /** What one step of a flight gives back. */
 export interface StepResult {
   readonly observation: number[] // see stateToObservation
+  readonly throttles: number[] // the action as throttles in [0, 1], one per nozzle
   readonly outcome: Outcome | null // null while the flight goes on
   readonly touchdown: Touchdown | null // null if the rocket hasn't touched the ground
   readonly failedChecks: readonly LandingCheck[] // the landing limits a touchdown went past
@@ -40,6 +40,11 @@ export class RocketLandingEnv {
     this.landingJudge = landingJudge
   }
 
+  /** Time flown since the start [s]. */
+  get time(): number {
+    return this.steps * this.rocketSimulator.dt
+  }
+
   /** Start a flight from `start`; gives the first observation. */
   reset(start: RocketState): number[] {
     this.rocketSimulator.reset(start)
@@ -49,7 +54,8 @@ export class RocketLandingEnv {
 
   /** Fly one control step with `action`. */
   step(action: readonly number[]): StepResult {
-    const stateAfterStep = this.rocketSimulator.step(actionToThrottles(action))
+    const throttles = actionToThrottles(action)
+    const stateAfterStep = this.rocketSimulator.step(throttles)
     this.steps += 1
 
     const touchdown = this.rocketSimulator.touchdown
@@ -57,6 +63,7 @@ export class RocketLandingEnv {
     const state = touchdown === null ? stateAfterStep : touchdown.state
     return {
       observation: stateToObservation(state, this.rocketSimulator.mass),
+      throttles,
       outcome: this.landingJudge.outcome(state, touchdown, this.steps),
       touchdown,
       failedChecks: touchdown === null ? [] : this.landingJudge.failedChecks(touchdown),
@@ -64,10 +71,11 @@ export class RocketLandingEnv {
   }
 }
 
-/** Build the landing environment from the contents of public/data/rocket_settings.json. */
-export function buildRocketLandingEnv(rocketSettingsJson: RocketSettingsJson): RocketLandingEnv {
-  const rocketSpec = buildRocketSpec(rocketSettingsJson.rocket_spec)
-  const envConfig = buildEnvConfig(rocketSettingsJson.env_config)
+/** Build the landing environment for this rocket and these settings. */
+export function buildRocketLandingEnv(
+  rocketSpec: RocketSpec,
+  envConfig: EnvConfig,
+): RocketLandingEnv {
   const rocketSimulator = new RocketSimulator(
     rocketSpec,
     envConfig.gravity,

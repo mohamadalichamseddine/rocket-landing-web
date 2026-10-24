@@ -1,16 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import networkWeights from '../../public/network/network_weights.json'
 import rocketSettings from '../../public/data/rocket_settings.json'
+import { buildEnvConfig } from '../../src/environment/env-config.ts'
 import {
   buildRocketLandingEnv,
   type StepResult,
 } from '../../src/environment/rocket-landing-env.ts'
 import { buildNetworkController } from '../../src/ppo/network-controller.ts'
+import { buildRocketSpec } from '../../src/rocket/rocket-spec.ts'
 import pythonResults from '../data/python_results.json'
 import { largestDifference } from '../largest-difference.ts'
 
 describe('RocketLandingEnv', () => {
-  const rocketLandingEnv = buildRocketLandingEnv(rocketSettings)
+  const rocketLandingEnv = buildRocketLandingEnv(
+    buildRocketSpec(rocketSettings.rocket_spec),
+    buildEnvConfig(rocketSettings.env_config),
+  )
   const networkController = buildNetworkController(networkWeights)
 
   it.each(pythonResults.network_flights)('flies "$name" as Python does', (networkFlight) => {

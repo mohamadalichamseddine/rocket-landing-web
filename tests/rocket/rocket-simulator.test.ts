@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import rocketSettings from '../../public/data/rocket_settings.json'
+import { buildEnvConfig } from '../../src/environment/env-config.ts'
 import { buildRocketLandingEnv } from '../../src/environment/rocket-landing-env.ts'
+import { buildRocketSpec } from '../../src/rocket/rocket-spec.ts'
 import type { RocketState } from '../../src/rocket/rocket-state.ts'
 import pythonResults from '../data/python_results.json'
 import { largestDifference } from '../largest-difference.ts'
 
 describe('RocketSimulator', () => {
-  const rocketSimulator = buildRocketLandingEnv(rocketSettings).rocketSimulator
+  const rocketSimulator = buildRocketLandingEnv(
+    buildRocketSpec(rocketSettings.rocket_spec),
+    buildEnvConfig(rocketSettings.env_config),
+  ).rocketSimulator
 
   it("computes the same mass, center of mass and moment of inertia as Python's Box2D", () => {
     // Box2D stores 32-bit floats, which keep about 7 digits: compare 6.

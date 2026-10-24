@@ -1,0 +1,133 @@
+:root {
+  color-scheme: dark;
+  --background: #0b1222;
+  --surface: #131c31;
+  --border: #26324d;
+  --text: #e9edf3;
+  --text-dim: #9aa6b8;
+  --flame: #ff841c; /* the flames' orange, as on the canvas */
+  --failed: #eb463c;
+  --monospace: Consolas, Menlo, 'DejaVu Sans Mono', monospace;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
+}
+
+/* One column, as wide as the canvas: 4:3, and short enough to leave room for the panel. */
+main {
+  box-sizing: content-box;
+  max-width: min(960px, 60svh * 4 / 3);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+}
+
+#scene {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 12px 0;
+}
+
+button {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--flame);
+  color: #1d1206;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.status-panel {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.flight-numbers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 4px 24px;
+  margin: 0 0 12px;
+}
+
+.flight-number {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label {
+  color: var(--text-dim);
+}
+
+.value {
+  margin: 0;
+  font-family: var(--monospace);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.throttle {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr 3.5rem;
+  align-items: center;
+  gap: 12px;
+}
+
+.throttle-bar {
+  height: 10px;
+  border: 1px solid var(--text-dim);
+  border-radius: 2px;
+}
+
+.throttle-fill {
+  height: 100%;
+  background: var(--flame);
+}
+
+.failure-reasons {
+  margin: 12px 0 0;
+  padding-left: 1.25rem;
+  color: var(--failed);
+}
+
+.failure-reasons:empty {
+  display: none;
+}

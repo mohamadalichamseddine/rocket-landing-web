@@ -1,5 +1,6 @@
 // Judging how a flight ends: a safe landing, an unsafe touchdown, or another ending.
 
+import { degrees, radians } from '../angles.ts'
 import { RocketPart, type Touchdown } from '../rocket/rocket-simulator.ts'
 import type { RocketState } from '../rocket/rocket-state.ts'
 import type { FlightLimits, LandingCriteria } from './env-config.ts'
@@ -79,10 +80,19 @@ export function partsOtherThanLegs(touchdown: Touchdown): ReadonlySet<RocketPart
   return new Set([...touchdown.parts].filter((part) => part !== RocketPart.LEG))
 }
 
-function radians(angleDeg: number): number {
-  return (angleDeg * Math.PI) / 180
-}
-
-function degrees(angle: number): number {
-  return (angle * 180) / Math.PI
+/** Why a touchdown was unsafe, one reason per line, e.g. "vertical speed 0.40 > 0.3 m/s". */
+export function describeFailures(
+  touchdown: Touchdown | null,
+  failedChecks: readonly LandingCheck[],
+): string[] {
+  if (touchdown === null) {
+    return []
+  }
+  const partReasons = [...partsOtherThanLegs(touchdown)]
+    .sort()
+    .map((part) => `${part} touched the ground`)
+  const checkReasons = failedChecks.map(
+    (check) => `${check.name} ${check.value.toFixed(2)} > ${check.limit} ${check.unit}`,
+  )
+  return [...partReasons, ...checkReasons]
 }

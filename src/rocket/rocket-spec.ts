@@ -7,7 +7,7 @@
 
 import type { RocketSettingsJson } from '../data-files.ts'
 
-/** A point or a direction in the rocket's frame. */
+/** A point or a direction: in the rocket's frame here, in the world or on screen elsewhere. */
 export interface Vector {
   readonly x: number
   readonly y: number

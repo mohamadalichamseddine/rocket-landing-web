@@ -9,3 +9,12 @@ export type NetworkWeightsJson = typeof networkWeightsJson
 
 /** The rocket spec and the environment settings, as Python built them from the YAML files. */
 export type RocketSettingsJson = typeof rocketSettingsJson
+
+/** Download the rocket settings file, which is served next to the page. */
+export async function fetchRocketSettings(): Promise<RocketSettingsJson> {
+  const response = await fetch(`${import.meta.env.BASE_URL}data/rocket_settings.json`)
+  if (!response.ok) {
+    throw new Error(`could not load the rocket settings: ${response.status} ${response.statusText}`)
+  }
+  return response.json()
+}
