@@ -59,12 +59,12 @@ if (matchMedia('(pointer: coarse)').matches) {
 }
 
 letNetworkFlyButton.addEventListener('click', () => {
-  keyboardControls.disable()
   flightLoop.fly(
     startSliders.start(),
     (observation) => networkController.act(observation),
-    () => {},
+    () => keyboardControls.disable(),
   )
+  keyboardControls.enable(pauseOrResume)
 })
 
 flyYourselfButton.addEventListener('click', () => {
@@ -75,14 +75,17 @@ flyYourselfButton.addEventListener('click', () => {
     () => keyboardControls.disable(),
   )
   flightLoop.pause('Press Space to start')
-  keyboardControls.enable(() => {
-    if (flightLoop.paused) {
-      flightLoop.resume()
-    } else {
-      flightLoop.pause('Paused: press Space')
-    }
-  })
+  keyboardControls.enable(pauseOrResume)
 })
+
+/** What Space does during a flight, as in the Python window: pause it, or go on with it. */
+function pauseOrResume(): void {
+  if (flightLoop.paused) {
+    flightLoop.resume()
+  } else {
+    flightLoop.pause('Paused: press Space')
+  }
+}
 
 /** The element of the page with this id, which must be of this type. */
 function pageElement<T extends HTMLElement>(id: string, type: new () => T): T {
