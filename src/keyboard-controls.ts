@@ -11,17 +11,16 @@ enum Key {
 }
 
 /**
- * The keyboard during a manual flight: Space starts it; then Up fires the main engine, Right
- * the left nozzle (it pushes right), Left the right nozzle (it pushes left), and the engines
- * are off when nothing is held.
+ * The keyboard during a manual flight: Space starts, pauses and resumes it; Up fires the main
+ * engine, Right the left nozzle (it pushes right), Left the right nozzle (it pushes left), and
+ * the engines are off when nothing is held.
  *
  * While enabled, Space and the arrow keys only fly the rocket: they don't scroll the page,
  * press the focused button or move a slider.
  */
 export class KeyboardControls {
   private readonly heldKeys = new Set<Key>()
-  private enabled = false
-  private onSpace: (() => void) | null = null // waiting for Space while not null
+  private onSpace: (() => void) | null = null // enabled while not null
 
   constructor(window: Window) {
     // Listening as the event comes down from the window, before the focused element sees it.
@@ -31,15 +30,13 @@ export class KeyboardControls {
     window.addEventListener('blur', () => this.heldKeys.clear())
   }
 
-  /** Take Space and the arrow keys from the page; `onSpace` is called at the next Space. */
+  /** Take Space and the arrow keys from the page; `onSpace` is called at each Space press. */
   enable(onSpace: () => void): void {
-    this.enabled = true
     this.onSpace = onSpace
   }
 
   /** Give Space and the arrow keys back to the page. */
   disable(): void {
-    this.enabled = false
     this.onSpace = null
     this.heldKeys.clear()
   }
@@ -52,21 +49,19 @@ export class KeyboardControls {
 
   private keyDown(event: KeyboardEvent): void {
     const key = keyOf(event)
-    if (!this.enabled || key === undefined) {
+    if (this.onSpace === null || key === undefined) {
       return
     }
     event.preventDefault()
     this.heldKeys.add(key)
-    if (key === Key.SPACE && !event.repeat && this.onSpace !== null) {
-      const onSpace = this.onSpace
-      this.onSpace = null
-      onSpace()
+    if (key === Key.SPACE && !event.repeat) {
+      this.onSpace()
     }
   }
 
   private keyUp(event: KeyboardEvent): void {
     const key = keyOf(event)
-    if (!this.enabled || key === undefined) {
+    if (this.onSpace === null || key === undefined) {
       return
     }
     event.preventDefault()

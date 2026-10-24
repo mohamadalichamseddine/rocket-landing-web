@@ -18,21 +18,35 @@ body {
   color: var(--text);
 }
 
-/* One column, as wide as the canvas: 4:3, and short enough to leave room for the panel. */
+/*
+ * Narrow screens: one column, as wide as the canvas (4:3), and short enough to leave room for
+ * the buttons under it. The page scrolls to the start sliders.
+ */
 main {
-  box-sizing: content-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   max-width: min(960px, 60svh * 4 / 3);
   margin: 0 auto;
   padding: 16px;
 }
 
+.workspace,
+.flight {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 h1 {
   margin: 0 0 4px;
   font-size: 1.5rem;
+  line-height: 1.2;
 }
 
 .intro {
-  margin: 0 0 16px;
+  max-width: 105ch;
+  margin: 0;
   color: var(--text-dim);
 }
 
@@ -57,7 +71,6 @@ h2 {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 16px;
-  margin: 12px 0;
 }
 
 button {
@@ -93,9 +106,13 @@ button:focus-visible {
   font-size: 0.9rem;
 }
 
+.hint span {
+  white-space: nowrap;
+}
+
 .panel {
-  margin-bottom: 12px;
   padding: 12px 16px;
+  font-size: 0.875rem;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
@@ -103,8 +120,8 @@ button:focus-visible {
 
 .flight-numbers {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
-  gap: 4px 24px;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  gap: 4px 16px;
   margin: 0 0 12px;
 }
 
@@ -155,8 +172,8 @@ button:focus-visible {
 
 .start-sliders {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-  gap: 12px 24px;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 10px 24px;
 }
 
 .start-slider {
@@ -174,5 +191,73 @@ button:focus-visible {
 .note {
   grid-column: 1 / -1;
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+}
+
+/*
+ * Wide screens: the page is the window's height and doesn't scroll. The start is on the left,
+ * the canvas in the middle and the flight on the right. The canvas takes the full height, at
+ * 4:3, and the side columns share the width left. In a window too short for a side column,
+ * that column scrolls instead of the page.
+ */
+@media (min-width: 1200px) and (min-height: 500px) {
+  main {
+    box-sizing: border-box;
+    height: 100dvh;
+    max-width: none;
+    gap: 16px;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+  }
+
+  h1 {
+    flex: none;
+    margin: 0;
+  }
+
+  .workspace {
+    flex: 1;
+    min-height: 0;
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .scene {
+    flex: 0 1 auto;
+    height: 100%;
+    aspect-ratio: 4 / 3; /* as wide as the full height allows; narrower if the window is */
+    min-width: 0;
+    display: grid;
+    place-items: center;
+  }
+
+  .start-panel,
+  .flight {
+    flex: 1 1 0;
+    max-width: 22rem;
+    overflow-y: auto;
+  }
+
+  .start-panel {
+    order: -1;
+    min-width: 15rem;
+  }
+
+  .flight {
+    min-width: 17rem; /* room for the flight numbers in two columns */
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #status-panel {
+    flex: 1 0 auto;
+  }
 }

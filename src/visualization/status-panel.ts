@@ -1,5 +1,5 @@
-// The flight's numbers, under the canvas so they stay readable on a phone: what the Python
-// window's status panel shows, and why a touchdown was unsafe.
+// The flight's numbers, in a panel beside the canvas (under it on narrow screens) so they stay
+// readable on a phone: what the Python window's status panel shows, and why a touchdown was unsafe.
 
 import { degrees } from '../angles.ts'
 import type { RocketState } from '../rocket/rocket-state.ts'

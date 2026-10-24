@@ -20,27 +20,32 @@
         <p class="intro">
           A 2D rocket learns to land on a pad. Its pilot is a small neural network (two layers of
           64), trained with PPO (Proximal Policy Optimization), a reinforcement learning
-          algorithm. Here the trained network flies in your browser, on a JavaScript copy of the
-          physics it trained on. Choose a start below, then let the network fly, or fly it
-          yourself.
+          algorithm.
           <a href="https://github.com/mohamadalichamseddine/deep-rl-flight-control"
             >The project on GitHub</a
           >
         </p>
       </header>
-      <canvas id="scene" aria-label="The rocket above the landing pad"></canvas>
-      <div class="controls">
-        <button id="let-network-fly" type="button">Let the network fly</button>
-        <button id="fly-yourself" class="secondary" type="button">Fly it yourself</button>
-        <p id="fly-yourself-hint" class="hint">
-          Space: start · Up: main engine · Left / Right: steer
-        </p>
+      <div class="workspace">
+        <div class="scene">
+          <canvas id="scene" aria-label="The rocket above the landing pad"></canvas>
+        </div>
+        <div class="flight">
+          <div class="controls">
+            <button id="let-network-fly" type="button">Let the network fly</button>
+            <button id="fly-yourself" class="secondary" type="button">Fly it yourself</button>
+            <p id="fly-yourself-hint" class="hint">
+              <span>Space: start or pause</span> · <span>Up: main engine</span> ·
+              <span>Left / Right: steer</span>
+            </p>
+          </div>
+          <section id="status-panel" class="panel" aria-label="Flight numbers"></section>
+        </div>
+        <section class="panel start-panel" aria-labelledby="start-heading">
+          <h2 id="start-heading">Start</h2>
+          <div id="start-sliders" class="start-sliders"></div>
+        </section>
       </div>
-      <section id="status-panel" class="panel" aria-label="Flight numbers"></section>
-      <section class="panel" aria-labelledby="start-heading">
-        <h2 id="start-heading">Start</h2>
-        <div id="start-sliders" class="start-sliders"></div>
-      </section>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
