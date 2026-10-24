@@ -27,8 +27,22 @@ main {
 }
 
 h1 {
-  margin: 0 0 12px;
+  margin: 0 0 4px;
   font-size: 1.5rem;
+}
+
+.intro {
+  margin: 0 0 16px;
+  color: var(--text-dim);
+}
+
+a {
+  color: var(--text);
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
 }
 
 #scene {
@@ -57,6 +71,12 @@ button {
   cursor: pointer;
 }
 
+button.secondary {
+  background: transparent;
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--text-dim);
+}
+
 button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
@@ -73,7 +93,8 @@ button:focus-visible {
   font-size: 0.9rem;
 }
 
-.status-panel {
+.panel {
+  margin-bottom: 12px;
   padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -130,4 +151,28 @@ button:focus-visible {
 
 .failure-reasons:empty {
   display: none;
+}
+
+.start-sliders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 12px 24px;
+}
+
+.start-slider {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 8px;
+}
+
+.start-slider input {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  accent-color: var(--flame);
+}
+
+.note {
+  grid-column: 1 / -1;
+  color: var(--text-dim);
+  font-size: 0.85rem;
 }
