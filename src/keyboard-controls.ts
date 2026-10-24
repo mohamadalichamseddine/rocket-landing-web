@@ -11,9 +11,9 @@ enum Key {
 }
 
 /**
- * The keyboard during a manual flight: Space starts, pauses and resumes it; Up fires the main
- * engine, Right the left nozzle (it pushes right), Left the right nozzle (it pushes left), and
- * the engines are off when nothing is held.
+ * The keyboard during a flight: Space pauses and resumes it (and starts a manual flight). In a
+ * manual flight, Up fires the main engine, Right the left nozzle (it pushes right), Left the
+ * right nozzle (it pushes left), and the engines are off when nothing is held.
  *
  * While enabled, Space and the arrow keys only fly the rocket: they don't scroll the page,
  * press the focused button or move a slider.

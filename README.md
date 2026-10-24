@@ -1,4 +1,4 @@
-# Rocket landing
+# Rocket Landing Controller with Deep Reinforcement Learning
 
 A web page where a neural network lands a 2D rocket on a pad, in your browser. You can also
 fly the rocket yourself with the keyboard.
@@ -30,8 +30,8 @@ Every 0.02 s of flight (50 steps per second, in real time):
    control, out of bounds, or time limit.
 
 With "Fly it yourself", your keys take the network's place in step 2: Up fires the main
-engine, and Left and Right push the rocket sideways. Space starts the flight, then pauses and
-resumes it.
+engine, and Left and Right push the rocket sideways. Space pauses and resumes any flight, and
+starts yours.
 
 The rocket, the environment and the network are copies of the Python ones. They keep the same
 class names (`RocketSimulator`, `RocketLandingEnv`, `LandingJudge`, `NetworkController`, …), so

@@ -195,12 +195,11 @@ button:focus-visible {
 }
 
 /*
- * Wide screens: the page is the window's height and doesn't scroll. The start is on the left,
- * the canvas in the middle and the flight on the right. The canvas takes the full height, at
- * 4:3, and the side columns share the width left. In a window too short for a side column,
- * that column scrolls instead of the page.
+ * Wide screens: the start on the left, the canvas in the middle and the flight on the right,
+ * side by side. The canvas takes the window's full height, at 4:3, and the side columns share
+ * the width left. The page only scrolls if the window is too short for the side boxes.
  */
-@media (min-width: 1200px) and (min-height: 500px) {
+@media (min-width: 1024px) {
   main {
     box-sizing: border-box;
     height: 100dvh;
@@ -208,15 +207,13 @@ button:focus-visible {
     gap: 16px;
   }
 
-  header {
-    display: flex;
-    align-items: baseline;
-    gap: 24px;
-  }
-
-  h1 {
-    flex: none;
-    margin: 0;
+  /*
+   * One line under the title. The line is about 86 em long, so the text gets a little smaller
+   * in narrower windows (with a margin for wider fonts), and wraps once it would get too small.
+   */
+  .intro {
+    max-width: none;
+    font-size: clamp(0.8rem, (100vw - 32px) / 92, 1rem);
   }
 
   .workspace {
@@ -233,19 +230,21 @@ button:focus-visible {
     aspect-ratio: 4 / 3; /* as wide as the full height allows; narrower if the window is */
     min-width: 0;
     display: grid;
-    place-items: center;
+    place-items: start center; /* level with the boxes' tops */
   }
 
   .start-panel,
   .flight {
     flex: 1 1 0;
     max-width: 22rem;
-    overflow-y: auto;
   }
 
+  /* As tall as its sliders, at the top. */
   .start-panel {
     order: -1;
-    min-width: 15rem;
+    align-self: flex-start;
+    box-sizing: border-box;
+    min-width: 17rem;
   }
 
   .flight {
@@ -255,9 +254,5 @@ button:focus-visible {
   .controls {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  #status-panel {
-    flex: 1 0 auto;
   }
 }
