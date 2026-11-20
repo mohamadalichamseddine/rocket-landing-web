@@ -1,7 +1,7 @@
-# Rocket Landing Controller with Deep Reinforcement Learning
+# Booster Landing Controller with Deep Reinforcement Learning
 
-A web page where a neural network lands a 2D rocket on a pad, in your browser. You can also
-fly the rocket yourself with the keyboard.
+A web page where a neural network lands a 2D rocket booster on a pad, in your browser. You
+can also fly the booster yourself with the keyboard.
 
 **Live: https://deep-rl-rocket-landing.web.app**
 
@@ -14,15 +14,15 @@ the page.
 
 ## How the page flies
 
-Every 0.02 s, the page reads the rocket's state, the network (a small forward pass in
+Every 0.02 s, the page reads the booster's state, the network (a small forward pass in
 TypeScript, 8 → 64 → 64 → 3) sets the three nozzle throttles, and planck.js (a JavaScript
-Box2D) moves the rocket. In "Fly it yourself", your arrow keys replace the network. The code
+Box2D) moves the booster. In "Fly it yourself", your arrow keys replace the network. The code
 is a copy of the Python project, with the same class names, and `tests/` checks it against
 results saved from Python.
 
 ## Project layout
 
-- `src/rocket/`, `src/environment/`, `src/ppo/`: the copies of the Python rocket, environment
+- `src/rocket/`, `src/environment/`, `src/ppo/`: the copies of the Python booster, environment
   and network.
 - `src/visualization/`: the drawing on the canvas, and the panel with the flight numbers.
 - `src/main.ts`, `src/flight-loop.ts`, `src/start-sliders.ts`, `src/keyboard-controls.ts`: the
@@ -53,7 +53,7 @@ firebase deploy --only hosting  # uploads dist/ to the project in .firebaserc
 
 ## Re-export the data
 
-When the network is retrained or the rocket or environment settings change, clone
+When the network is retrained or the booster or environment settings change, clone
 deep-rl-flight-control next to this repo, then run this from this repo's folder:
 
 ```sh
